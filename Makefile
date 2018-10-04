@@ -18,7 +18,7 @@ INCLUDES += $(OPENCV_CFLAGS) $(FFTW_CFLAGS)
 LIBS = $(OPENCV_LIBS) $(FFTW_LIBS)
 
 #find all the source files
-SRCS = main.cc 
+SRCS = main.cc detect_motion.cc
 PROG = video_in
 
 

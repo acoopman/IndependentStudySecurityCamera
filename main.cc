@@ -1,6 +1,7 @@
 //security camera 
 #include "opencv2/opencv.hpp"
 #include <iostream>
+#include "detect_motion.h"
 
 using namespace cv;
 using namespace std;
@@ -36,42 +37,25 @@ q
 };
 */
 
-int detect_motion(uint8_t * in, int height, int width, uint8_t threshold)
-{
-  int count = 0;
-  for(int k = 0; k < height; k++) //process height/vertical
-    {
-      for(int i = 0; i< width; i++) //process columns horizontal
-	{
-	  if(in[i + width*k  ] > threshold)
-	    {
-	      count++;
-	      if(count > 60)
-		{
-		  return 1;
-		}
-	      
-	    }
-	  
-	}
-    }
-  return 0;
-}
-
 int main(int, char**)
 {
-    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
+  //threshold values to control things:
+  const int threshold_pixel_change = 200;
+  int motion_flag = 0;
+  
+  //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
+    VideoCapture cap(0); // open the default camera is 0, usb camera is 1
     if(!cap.isOpened())  // check if we succeeded
       return -1;
 
     //make an output window up
     namedWindow("frame",1);
     namedWindow("grayframe",1);
-    namedWindow("previous_frame",1);
+    namedWindow("background_frame",1);
     namedWindow("diff",1);
     
     int frame_count = 0;
-    int bj_count = 100;
+    int bj_count = 50;
     
     Mat frame;
     Mat background_frame;
@@ -83,9 +67,9 @@ int main(int, char**)
 	cap >> frame; // get a new frame from camera
 
 	int height  = frame.rows;
-	int columns = frame.cols;
+	int width = frame.cols;
 
-	//cout << "Image size is (width, height)" << columns << " " << height << endl;
+	//cout << "Image size is (width, height)" << width << " " << height << endl;
 	
 	//covert the input frame to a black and white frame
 	cvtColor(frame, gray_frame, CV_BGR2GRAY);
@@ -100,27 +84,40 @@ int main(int, char**)
 	
        
 	uint8_t * data = diff_frame.data;
-	int motion = detect_motion(data, height, columns, 128);
-	if(motion)
+	int pixels_change = detect_motion(data, height, width, 200);
+	if(pixels_change > threshold_pixel_change)
 	  {
 	    cout << "Motion detected \n";
 	    imwrite( "./Motion.jpg", frame );
+	    motion_flag = 1;
+	  }
+	else
+	  {
+	    motion_flag = 0;
 	  }
 
 	//display the frames
 	imshow("frame",frame);
 	imshow("grayframe",gray_frame);
-	imshow("previous_frame", background_frame);
+	imshow("background_frame", background_frame);
 	imshow("diff",diff_frame);  
        	
 	
 	//press q to quit
 	int key = waitKey(30);
-	if(key == 113) //quit
+	//	if(key == 113) //quit
+	  if(key == 'q') //quit	  
 	  break;
 
+
+	if(key == ' ')
+	  {
+	    cout << "space bar was pressed, make a new background\n";
+	    background_frame = gray_frame.clone();
+	  }
+	
 	frame_count++;
-	if(( (frame_count % bj_count) == 0) && (!motion))
+	if(( (frame_count % bj_count) == 0) && (!motion_flag))
 	  {
 	    background_frame = gray_frame.clone();
 	  }
