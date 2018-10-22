@@ -45,7 +45,15 @@ struct background_configuration
   int use_exponential_filter;
 };
 
+#define MAX_KERNEL_LENGTH 31;
+void image_blur(Mat & in)
+{
+  //  for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
+  // for (int i  = 1; i < 10; i++)
+    medianBlur ( in, in, 9 );
+      
 
+}
 
 int main(int, char**)
 {
@@ -73,6 +81,7 @@ int main(int, char**)
 
     background_configuration bg_config;
     bg_config.update_frequency = 30;
+    bg_config.blur_background = 1;
       
 
     while(1)
@@ -90,14 +99,17 @@ int main(int, char**)
 	  background_frame = gray_frame.clone();
 	
 	cout << "frame count = " << frame_count << endl;
+
 	
 	//-----------------------------------------
 	//subtract current frame from previous frame
 	diff_frame = abs(gray_frame - background_frame);
-	
+
+	image_blur(diff_frame);
        
 	uint8_t * data = diff_frame.data;
 	int pixels_change = detect_motion(data, height, width, 200);
+	printf("Number of pixels changed = %i\n", pixels_change);
 	if(pixels_change > threshold_pixel_change)
 	  {
 	    cout << "Motion detected \n";
@@ -133,6 +145,10 @@ int main(int, char**)
 	if(( (frame_count % bg_config.update_frequency) == 0) && (!motion_flag))
 	  {
 	    background_frame = gray_frame.clone();
+
+	    if(bg_config.blur_background == 1)
+	      image_blur(background_frame);
+
 	  }
 	
     }
