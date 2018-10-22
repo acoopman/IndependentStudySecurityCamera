@@ -37,6 +37,16 @@ q
 };
 */
 
+
+struct background_configuration
+{
+  int update_frequency;
+  int blur_background;
+  int use_exponential_filter;
+};
+
+
+
 int main(int, char**)
 {
   //threshold values to control things:
@@ -55,15 +65,18 @@ int main(int, char**)
     namedWindow("diff",1);
     
     int frame_count = 0;
-    int bj_count = 50;
     
     Mat frame;
     Mat background_frame;
     Mat gray_frame;
     Mat diff_frame;
-    
-      while(1)
-	{
+
+    background_configuration bg_config;
+    bg_config.update_frequency = 30;
+      
+
+    while(1)
+      {
 	cap >> frame; // get a new frame from camera
 
 	int height  = frame.rows;
@@ -117,7 +130,7 @@ int main(int, char**)
 	  }
 	
 	frame_count++;
-	if(( (frame_count % bj_count) == 0) && (!motion_flag))
+	if(( (frame_count % bg_config.update_frequency) == 0) && (!motion_flag))
 	  {
 	    background_frame = gray_frame.clone();
 	  }
