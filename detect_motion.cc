@@ -1,6 +1,13 @@
 #include "detect_motion.h"
 
 
+void image_blur(Mat & in, int N)
+{
+  //  for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
+  for (int i  = 0; i < N; i++)
+    medianBlur ( in, in, 9 );
+}
+
 //returns the number of pixels above the threshold
 int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * param)
 {
@@ -18,3 +25,4 @@ int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * 
     }
   return count;
 }
+

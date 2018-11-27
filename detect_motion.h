@@ -2,7 +2,10 @@
 #define DETECT_MOTION_H
 
 #include <stdint.h>
+#include "opencv2/opencv.hpp"
 
+using namespace cv;
+using namespace std;
 
 typedef struct motion_detect_params
 {
@@ -21,5 +24,6 @@ typedef struct classification_params
 
 int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * param);
 
-
+void image_blur(Mat & in, int N);
+  
 #endif

@@ -40,13 +40,7 @@ q
 
 
 
-#define MAX_KERNEL_LENGTH 31;
-void image_blur(Mat & in, int N)
-{
-  //  for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
-  for (int i  = 0; i < N; i++)
-    medianBlur ( in, in, 9 );
-}
+
 
 int main(int, char**)
 {
@@ -78,11 +72,14 @@ int main(int, char**)
     detect_params.num_of_blurs = 5;
     detect_params.threshold_pixel_change = 200;
     detect_params.pixel_value_threshold = 50;
-    
+
+    //main loop of the program
     while(1)
       {
-	cap >> frame; // get a new frame from camera
+	//use openCV's VideoCapture class to get an input frame from camera
+	cap >> frame; 
 
+	//get the height and width parameters
 	int height  = frame.rows;
 	int width = frame.cols;
 
@@ -91,25 +88,24 @@ int main(int, char**)
 	//covert the input frame to a black and white frame
 	cvtColor(frame, gray_frame, CV_BGR2GRAY);
 
-	
+	//blur the input image if the flag is on
 	if(detect_params.blur_background == 1)
 	  image_blur(gray_frame, detect_params.num_of_blurs);
-	
+
+	//if this is the first frame, set it as the background frame
 	if(frame_count == 0)
 	  background_frame = gray_frame.clone();
 	
 	cout << "frame count = " << frame_count << endl;
 
-
-	//-----------------------------------------
-	//subtract current frame from previous frame
+	//subtract current frame from the background frame
 	diff_frame = abs(gray_frame - background_frame);
 
-
-       
-	uint8_t * data = diff_frame.data;
-	int pixels_change = detect_motion(data, height, width, &detect_params);
+	//returns the number of pixels that are greater than the threshold
+	int pixels_change = detect_motion(diff_frame.data, height, width, &detect_params);
 	printf("Number of pixels changed = %i\n", pixels_change);
+
+	//if the pixels changed is greater than the set threshold, say there is motion
 	if(pixels_change > detect_params.threshold_pixel_change)
 	  {
 	    cout << "Motion detected \n";
@@ -121,19 +117,24 @@ int main(int, char**)
 	    motion_flag = 0;
 	  }
 
-	//display the frames
+	//update background frame every 30 frames, and if theres no motion
+	if(( (frame_count % detect_params.update_frequency) == 0) && (!motion_flag))
+	  {
+	    background_frame = gray_frame.clone();	   
+	  }
+	
+	//display the frames ----------------------------------------
 	imshow("frame",frame);
 	imshow("grayframe",gray_frame);
 	imshow("background_frame", background_frame);
 	imshow("diff",10*diff_frame);  
        	
 	
-	//press q to quit
+	//press q to quit -------------------------------------------
 	int key = waitKey(30);
 	//	if(key == 113) //quit
 	  if(key == 'q') //quit	  
 	  break;
-
 
 	if(key == ' ')
 	  {
@@ -141,12 +142,6 @@ int main(int, char**)
 	    background_frame = gray_frame.clone();
 	  }
 	
-	//update background frame every 30 frames, and if theres no motion
-	if(( (frame_count % detect_params.update_frequency) == 0) && (!motion_flag))
-	  {
-	    background_frame = gray_frame.clone();	   
-	  }
-
 	//update frame counter
 	frame_count++;
 	
