@@ -38,13 +38,7 @@ q
 */
 
 
-struct background_configuration
-{
-  int update_frequency;
-  int blur_background;
-  int use_exponential_filter;
-  int num_of_blurs;
-};
+
 
 #define MAX_KERNEL_LENGTH 31;
 void image_blur(Mat & in, int N)
@@ -52,14 +46,11 @@ void image_blur(Mat & in, int N)
   //  for ( int i = 1; i < MAX_KERNEL_LENGTH; i = i + 2 )
   for (int i  = 0; i < N; i++)
     medianBlur ( in, in, 9 );
-      
-
 }
 
 int main(int, char**)
 {
-  //threshold values to control things:
-  const int threshold_pixel_change = 200;
+
   int motion_flag = 0;
   
   //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
@@ -81,12 +72,13 @@ int main(int, char**)
     Mat diff_frame;
 
     //lets configure ther background struct 
-    background_configuration bg_config;
-    bg_config.update_frequency = 30;
-    bg_config.blur_background = 1;
-    bg_config.num_of_blurs = 5;
-      
-
+    motion_detect_params_t detect_params;
+    detect_params.update_frequency = 30;
+    detect_params.blur_background = 1;
+    detect_params.num_of_blurs = 5;
+    detect_params.threshold_pixel_change = 200;
+    detect_params.pixel_value_threshold = 50;
+    
     while(1)
       {
 	cap >> frame; // get a new frame from camera
@@ -100,8 +92,8 @@ int main(int, char**)
 	cvtColor(frame, gray_frame, CV_BGR2GRAY);
 
 	
-	if(bg_config.blur_background == 1)
-	  image_blur(gray_frame, bg_config.num_of_blurs);
+	if(detect_params.blur_background == 1)
+	  image_blur(gray_frame, detect_params.num_of_blurs);
 	
 	if(frame_count == 0)
 	  background_frame = gray_frame.clone();
@@ -116,9 +108,9 @@ int main(int, char**)
 
        
 	uint8_t * data = diff_frame.data;
-	int pixels_change = detect_motion(data, height, width, 50);
+	int pixels_change = detect_motion(data, height, width, &detect_params);
 	printf("Number of pixels changed = %i\n", pixels_change);
-	if(pixels_change > threshold_pixel_change)
+	if(pixels_change > detect_params.threshold_pixel_change)
 	  {
 	    cout << "Motion detected \n";
 	    imwrite( "./Motion.jpg", frame );
@@ -150,7 +142,7 @@ int main(int, char**)
 	  }
 	
 	//update background frame every 30 frames, and if theres no motion
-	if(( (frame_count % bg_config.update_frequency) == 0) && (!motion_flag))
+	if(( (frame_count % detect_params.update_frequency) == 0) && (!motion_flag))
 	  {
 	    background_frame = gray_frame.clone();	   
 	  }
