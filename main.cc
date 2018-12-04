@@ -41,14 +41,13 @@ q
 
 
 
-
 int main(int, char**)
 {
 
   int motion_flag = 0;
   
   //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
-    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
+    VideoCapture cap(0); // open the default camera is 0, usb camera is 1
     if(!cap.isOpened())  // check if we succeeded
       return -1;
 
@@ -71,7 +70,7 @@ int main(int, char**)
     detect_params.blur_background = 1;
     detect_params.num_of_blurs = 5;
     detect_params.threshold_pixel_change = 200;
-    detect_params.pixel_value_threshold = 50;
+    detect_params.pixel_value_threshold = 75;
 
     //main loop of the program
     while(1)
@@ -99,30 +98,25 @@ int main(int, char**)
 	cout << "frame count = " << frame_count << endl;
 
 	//subtract current frame from the background frame
-	diff_frame = abs(gray_frame - background_frame);
+	subtract_background(diff_frame, gray_frame, background_frame);
 
+	
+	//------------------------------------------------------------------------------
+	
 	//returns the number of pixels that are greater than the threshold
-	int pixels_change = detect_motion(diff_frame.data, height, width, &detect_params);
-	printf("Number of pixels changed = %i\n", pixels_change);
 
-	//if the pixels changed is greater than the set threshold, say there is motion
-	if(pixels_change > detect_params.threshold_pixel_change)
+	motion_flag = detect_motion(diff_frame.data, height, width, &detect_params);
+
+	if(motion_flag)
 	  {
 	    cout << "Motion detected \n";
-	    imwrite( "./Motion.jpg", frame );
-	    motion_flag = 1;
-	  }
-	else
-	  {
-	    motion_flag = 0;
 	  }
 
+	//------------------------------------------------------------------------------
 	//update background frame every 30 frames, and if theres no motion
-	if(( (frame_count % detect_params.update_frequency) == 0) && (!motion_flag))
-	  {
-	    background_frame = gray_frame.clone();	   
-	  }
-	
+	update_background(gray_frame, background_frame, &detect_params, motion_flag, frame_count);
+
+
 	//display the frames ----------------------------------------
 	imshow("frame",frame);
 	imshow("grayframe",gray_frame);
