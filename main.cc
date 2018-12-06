@@ -6,6 +6,9 @@
 using namespace cv;
 using namespace std;
 
+//to learn video in and out with opencv use this link:
+//https://www.learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
+
 //img.at<array<uint8_t,3>>(0,0);
 /*
 class Mat
@@ -51,6 +54,8 @@ int main(int, char**)
     if(!cap.isOpened())  // check if we succeeded
       return -1;
 
+    VideoWriter video("outcpp.avi",CV_FOURCC('M','J','P','G'),10, Size(640,480));
+    
     //make an output window up
     namedWindow("frame",1);
     namedWindow("grayframe",1);
@@ -126,7 +131,9 @@ int main(int, char**)
 	imshow("background_frame", background_frame);
 	imshow("diff",10*diff_frame);  
        	
-	
+	 // Write the frame into the file 'outcpp.avi'
+	video.write(frame);
+    
 	//press q to quit -------------------------------------------
 	int key = waitKey(30);
 	//	if(key == 113) //quit
@@ -143,6 +150,13 @@ int main(int, char**)
 	frame_count++;
 	
     }
+    // When everything done, release the video capture and write object
+    cap.release();
+    video.release();
+
+    // Closes all the windows
+    destroyAllWindows();
+  
     // the camera will be deinitialized automatically in VideoCapture destructor
     return 0;
 } 
