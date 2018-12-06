@@ -47,7 +47,7 @@ int main(int, char**)
   int motion_flag = 0;
   
   //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
-    VideoCapture cap(0); // open the default camera is 0, usb camera is 1
+    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
     if(!cap.isOpened())  // check if we succeeded
       return -1;
 
@@ -110,6 +110,9 @@ int main(int, char**)
 	if(motion_flag)
 	  {
 	    cout << "Motion detected \n";
+	    cout << "center_x = " << detect_params.center_x  << "center_y = " << detect_params.center_y << endl;
+	    circle(frame, Point(detect_params.center_x, detect_params.center_y), 10,
+		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 	  }
 
 	//------------------------------------------------------------------------------

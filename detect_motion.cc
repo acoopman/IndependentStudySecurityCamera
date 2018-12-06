@@ -13,19 +13,27 @@ int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * 
 {
   //figure out how many pixels are greater than the threshold
   int count = 0;
-  for(int k = 0; k < height; k++) //process height/vertical
+  int sum_x = 0;
+  int sum_y = 0;
+  
+  for(int y = 0; y < height; y++) //process height/vertical
     {
-      for(int i = 0; i< width; i++) //process columns horizontal
+      for(int x = 0; x< width; x++) //process columns horizontal
 	{
-	  if(in[i + width*k  ] > param->pixel_value_threshold)
+	  if(in[x + width*y  ] > param->pixel_value_threshold)
 	    {
+	      sum_x += x;
+	      sum_y += y;
 	      count++;
 	    }
 	  
 	}
     }
-
-
+  if(count != 0)
+    {
+      param->center_x = (sum_x/count);
+      param->center_y = (sum_y/count);
+    }
   //-----------------------------------------
 
   int pixels_change = count;
