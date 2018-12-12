@@ -74,7 +74,7 @@ int main(int, char**)
     detect_params.update_frequency = 30;
     detect_params.blur_background = 1;
     detect_params.num_of_blurs = 5;
-    detect_params.threshold_pixel_change = 200;
+    detect_params.threshold_pixel_change = 100;
     detect_params.pixel_value_threshold = 75;
 
     //main loop of the program
@@ -100,7 +100,7 @@ int main(int, char**)
 	if(frame_count == 0)
 	  background_frame = gray_frame.clone();
 	
-	cout << "frame count = " << frame_count << endl;
+	//cout << "frame count = " << frame_count << endl;
 
 	//subtract current frame from the background frame
 	subtract_background(diff_frame, gray_frame, background_frame);
@@ -112,11 +112,25 @@ int main(int, char**)
 
 	motion_flag = detect_motion(diff_frame.data, height, width, &detect_params);
 
+	cout << "Pixel changes = " <<  detect_params.number_pixels_changed << " threshold = " <<  detect_params.threshold_pixel_change << endl;
+	cout << "std_x = " << detect_params.std_x  << " std_y = " << detect_params.std_y << endl;
+	
 	if(motion_flag)
 	  {
 	    cout << "Motion detected \n";
 	    cout << "center_x = " << detect_params.center_x  << "center_y = " << detect_params.center_y << endl;
 	    circle(frame, Point(detect_params.center_x, detect_params.center_y), 10,
+		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
+	    int radius = ((detect_params.std_x+detect_params.std_y)/2);
+	    if(detect_params.center_x+radius > width)
+	      {
+		radius = width-detect_params.center_x -1;
+	      }
+	    if(detect_params.center_y+radius > height)
+	      {
+		radius = height-detect_params.center_y -1;
+	      }
+	    circle(frame, Point(detect_params.center_x, detect_params.center_y), radius,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 	  }
 

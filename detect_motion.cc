@@ -13,9 +13,11 @@ int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * 
 {
   //figure out how many pixels are greater than the threshold
   int count = 0;
-  int sum_x = 0;
-  int sum_y = 0;
-  
+  float sum_x = 0;
+  float sum_y = 0;
+  param->std_x = 0;
+  param->std_y = 0;
+  //find how many pixels have changed and calculate the mean
   for(int y = 0; y < height; y++) //process height/vertical
     {
       for(int x = 0; x< width; x++) //process columns horizontal
@@ -29,11 +31,48 @@ int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * 
 	  
 	}
     }
-  if(count != 0)
+
+  param->number_pixels_changed = count;
+  
+  //no pixels have changed, return no motion
+  if(count == 0)
+    return 0;
+
+  //get the mean/center of the cluster  
+  param->center_x = (sum_x/count);
+  param->center_y = (sum_y/count);
+
+
+  //-----------------------------------------
+  //find the standard deviation of the cluster
+  sum_x = 0;
+  sum_y = 0;
+
+  for(int y = 0; y < height; y++) //process height/vertical
     {
-      param->center_x = (sum_x/count);
-      param->center_y = (sum_y/count);
+      for(int x = 0; x< width; x++) //process columns horizontal
+	{
+	  if(in[x + width*y  ] > param->pixel_value_threshold)
+	    {
+	      sum_x += (param->center_x - x)*(param->center_x - x);
+	      sum_y += (param->center_y - y)*(param->center_y - y);
+	    }
+	  
+	}
     }
+
+  param->std_x = sqrtf(sum_x/(float)count);
+  param->std_y = sqrtf(sum_y/(float)count);
+
+  //---------------------------------------
+  //check to make sure the std are widthin the threshold
+  
+  if(param->std_x > 100.0f)
+    return 0;
+  if(param->std_y > 100.0f)
+    return 0;
+    
+  
   //-----------------------------------------
 
   int pixels_change = count;

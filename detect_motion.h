@@ -17,6 +17,10 @@ typedef struct motion_detect_params
   int pixel_value_threshold;
   int center_x;
   int center_y;
+  float std_x;
+  float std_y;
+  int number_pixels_changed;
+  
 }  motion_detect_params_t;
 
 typedef struct classification_params
