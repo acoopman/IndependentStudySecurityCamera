@@ -98,14 +98,11 @@ int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * 
 void update_background(Mat & input, Mat & background, motion_detect_params_t * params,
 		       int motion_flag, int frame_count)
 {
-  
   if(( (frame_count % params->update_frequency) == 0) && (!motion_flag))
     {
       background = input.clone();
       cout << "Background has changed\n";
-    }
-  
-	
+    } 
 }
 
 //-------------------------------------------------------------------------------
