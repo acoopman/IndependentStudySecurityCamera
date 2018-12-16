@@ -9,41 +9,6 @@ using namespace std;
 //to learn video in and out with opencv use this link:
 //https://www.learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
 
-//img.at<array<uint8_t,3>>(0,0);
-/*
-class Mat
-{
-public:
-    // ... a lot of methods ...
-    ...
-
-    //! includes several bit-fields:
-    //     - the magic signature
-    //     - continuity flag
-    //     - depth
-    //     - number of channels
-     
-    int flags;
-    //! the array dimensionality, >= 2
-    int dims;
-    //! the number of height and columns or (-1, -1) when the array has more than 2 dimensions
-    int height, width;
-    //! pointer to the data
-    uchar* data;
-
-    //! pointer to the reference counter;
-    // when array points to user-allocated data, the pointer is NULL
-    int* refcount;
-q
-    // other members
-    ...
-};
-*/
-
-
-
-
-
 int main(int, char**)
 {
 
