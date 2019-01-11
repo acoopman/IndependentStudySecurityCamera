@@ -3,6 +3,8 @@
 #include <iostream>
 #include "detect_motion.h"
 #include <stdlib.h>
+#include <string.h>
+#include "parse_argv.h"
 
 using namespace cv;
 using namespace std;
@@ -12,10 +14,11 @@ using namespace std;
 
 int main(int argc, char *argv[])
 {
+  video_in_params_t video_params;
   int motion_flag = 0;
-  int write_output = 0;
-  string outputfile = "output.avi";
-  int video_source = 1;
+  video_params.write_output = 0;
+  video_params.outputfile = "output.avi";
+  video_params.video_source = 1;
   
  //lets configure ther background struct 
     motion_detect_params_t detect_params;
@@ -28,44 +31,17 @@ int main(int argc, char *argv[])
   
   printf("argc = %i\n", argc);
 
-  printf("usage:  ./video_in [-w] [-source] [-thresh]\n");
+  printf("usage:  ./video_in [-w foo.avi] [-source (0,1)] [-thresh (0-255)]\n");
   
-  for (int i = 1; i < argc; i++)
-    {
-      printf("input string = %s\n",argv[i]);
-      if( (argv[i][0] == '-')  && (argv[i][1] == 'w'))
-	{
-	  write_output = 1;
-	  printf("Will write output\n");
-
-	  outputfile = argv[i+1];
-	  i++;
-	}
-      
-      if( (argv[i][0] == '-')  && (argv[i][1] == 's') && (argv[i][2] == 'o'))
-	{
-	  video_source = atoi(argv[i+1]);
-	  i++;
-	  printf("video source = %i\n",video_source);
-	}
-
-      if( (argv[i][0] == '-')  && (argv[i][1] == 't') && (argv[i][2] == 'h'))
-	{
-	  detect_params.pixel_value_threshold = atoi(argv[i+1]);;
-	  i++;
-	  printf("threshold = %i\n",detect_params.pixel_value_threshold);
-	}
-      
-    }
-
+  parse_argv(argc, argv, &detect_params, &video_params);
 
   //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
-    VideoCapture cap(video_source); // open the default camera is 0, usb camera is 1
+    VideoCapture cap(video_params.video_source); // open the default camera is 0, usb camera is 1
     if(!cap.isOpened())  // check if we succeeded
       return -1;
 
     //    if(write_output)
-      VideoWriter video_out(outputfile,CV_FOURCC('M','J','P','G'),10, Size(640,480));
+      VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),10, Size(640,480));
     
     
     //make an output window up
@@ -151,7 +127,7 @@ int main(int argc, char *argv[])
 	imshow("diff",10*diff_frame);  
        	
 	// Write the frame into the file 'outcpp.avi'
-	if(write_output)
+	if(video_params.write_output)
 	  video_out.write(frame);
     
 	//press q to quit -------------------------------------------

@@ -28,6 +28,16 @@ typedef struct classification_params
   int label;
 }classification_params_t;
 
+typedef struct video_in_params
+{
+  int write_output;
+  string outputfile;
+  int video_source;
+
+}video_in_params_t;
+
+
+
 //returns 1 if there is motion, otherwise 0 for no motion
 int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * param);
 
