@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
   
  //lets configure ther background struct 
     motion_detect_params_t detect_params;
-    detect_params.update_frequency = 30;
+    detect_params.update_frequency = -1; //-1 should never update background
     detect_params.blur_background = 1;
     detect_params.num_of_blurs = 5;
     detect_params.threshold_pixel_change = 100;
@@ -104,7 +104,7 @@ int main(int argc, char *argv[])
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 
 
-	    
+	    /*  
 	    int radius = ((detect_params.std_x+detect_params.std_y)/2);
 	    if(detect_params.center_x+radius > width)
 	      {
@@ -114,9 +114,9 @@ int main(int argc, char *argv[])
 	      {
 		radius = height-detect_params.center_y -1;
 	      }
-	    //	    circle(frame, Point(detect_params.center_x, detect_params.center_y), radius,
-	    //	   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
-
+	    	    circle(frame, Point(detect_params.center_x, detect_params.center_y), radius,
+	    	   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
+	    */
 	    Point pt1(detect_params.center_x+detect_params.std_x, detect_params.center_y-detect_params.std_y);
 	    Point pt2(detect_params.center_x-detect_params.std_x, detect_params.center_y+detect_params.std_y);
 
