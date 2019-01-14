@@ -102,6 +102,9 @@ int main(int argc, char *argv[])
 	    cout << "center_x = " << detect_params.center_x  << "center_y = " << detect_params.center_y << endl;
 	    circle(frame, Point(detect_params.center_x, detect_params.center_y), 10,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
+
+
+	    
 	    int radius = ((detect_params.std_x+detect_params.std_y)/2);
 	    if(detect_params.center_x+radius > width)
 	      {
@@ -111,8 +114,14 @@ int main(int argc, char *argv[])
 	      {
 		radius = height-detect_params.center_y -1;
 	      }
-	    circle(frame, Point(detect_params.center_x, detect_params.center_y), radius,
-		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
+	    //	    circle(frame, Point(detect_params.center_x, detect_params.center_y), radius,
+	    //	   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
+
+	    Point pt1(detect_params.center_x+detect_params.std_x, detect_params.center_y-detect_params.std_y);
+	    Point pt2(detect_params.center_x-detect_params.std_x, detect_params.center_y+detect_params.std_y);
+
+	    rectangle(frame, pt1, pt2, Scalar(0,255,0));//, int lineType=8, int shift=0)¶)//, int thickness=1, int lineType=LINE_8, int shift=0 )
+
 	  }
 
 	//------------------------------------------------------------------------------
