@@ -3,40 +3,10 @@
 
 #include <stdint.h>
 #include "opencv2/opencv.hpp"
+#include "typedefs.h"
 
 using namespace cv;
 using namespace std;
-
-typedef struct motion_detect_params
-{
-  int update_frequency;
-  int blur_background;
-  int use_exponential_filter;
-  int num_of_blurs;
-  int threshold_pixel_change;
-  int pixel_value_threshold;
-  int center_x;
-  int center_y;
-  float std_x;
-  float std_y;
-  int number_pixels_changed;
-  
-}  motion_detect_params_t;
-
-typedef struct classification_params
-{
-  int label;
-}classification_params_t;
-
-typedef struct video_in_params
-{
-  int write_output;
-  string outputfile;
-  int video_source;
-
-}video_in_params_t;
-
-
 
 //returns 1 if there is motion, otherwise 0 for no motion
 int detect_motion(uint8_t * in, int height, int width, motion_detect_params_t * param);

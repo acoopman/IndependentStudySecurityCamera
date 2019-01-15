@@ -18,14 +18,15 @@ INCLUDES += $(OPENCV_CFLAGS) $(FFTW_CFLAGS)
 LIBS = $(OPENCV_LIBS) $(FFTW_LIBS)
 
 #find all the source files
-SRCS = main.cc detect_motion.cc parse_argv.cc
+HDRS = detect_motion.h parse_argv.h typedefs.h feature_extract.h decision.h
+SRCS = main.cc detect_motion.cc parse_argv.cc feature_extract.cc decision.cc
 PROG = video_in
 
 
 all: $(PROG)
 
 #------------------------------------------------------------------------------------------------------------------------------------------------
-$(PROG): $(SRCS) detect_motion.h parse_argv.h
+$(PROG): $(SRCS) $(HDRS)
 	$(CC) $(SRCS) $(CFLAGS) $(INCLUDES)  -o  $(PROG) $(LIBS)
 
 clean:
