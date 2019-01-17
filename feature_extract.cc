@@ -1,4 +1,10 @@
 #include "feature_extract.h"
+#include <math.h>
+
+//features so far
+//1) number pixels changed  TODO want it in percentage
+//2) center of cluster
+//3) std of cluster
 
 
 void extract_features(features_t * features,
@@ -7,9 +13,73 @@ void extract_features(features_t * features,
 		      int width,
 		      motion_detect_params_t * param)
 {
+	//returns the number of pixels above the threshold
+	  //figure out how many pixels are greater than the threshold
+	  int count = 0;
+	  float sum_x = 0;
+	  float sum_y = 0;
+	  features->std_x = 0;
+	  features->std_y = 0;
+	  //find how many pixels have changed and calculate the mean
+	  for(int y = 0; y < height; y++) //process height/vertical
+	    {
+	      for(int x = 0; x< width; x++) //process columns horizontal
+		{
+		  if(in[x + width*y  ] > param->pixel_value_threshold)
+		    {
+		      sum_x += x;
+		      sum_y += y;
+		      count++;
+		    }
+
+		}
+	    }
+
+	  features->number_pixels_changed = count;
+ 
+	  //get the mean/center of the cluster
+
+	  if(count == 0)
+	    {
+	      features->center_x = 0;
+	      features->center_y = 0;
+	    }
+	  else
+	    {
+	      features->center_x = (sum_x/count);
+	      features->center_y = (sum_y/count);
+	    }
+	  //-----------------------------------------
+	  //find the standard deviation of the cluster
+		sum_x = 0;
+		sum_y = 0;
+
+	  for(int y = 0; y < height; y++) //process height/vertical
+	    {
+	      for(int x = 0; x< width; x++) //process columns horizontal
+		{
+		  if(in[x + width*y  ] > param->pixel_value_threshold)
+		    {
+		      sum_x += (features->center_x - x)*(features->center_x - x);
+		      sum_y += (features->center_y - y)*(features->center_y - y);
+		    }
+
+		}
+	    }
 
 
-
+	  if(count == 0)
+	    {
+	      features->std_x = 0;
+	      features->std_y = 0;
+	    }
+	  else
+	    {
+	      features->std_x = sqrtf(sum_x/(float)count);
+	      features->std_y = sqrtf(sum_y/(float)count);
+	    }
+	  //---------------------------------------
+	  //check to make sure the std are widthin the threshold
 
 
 }

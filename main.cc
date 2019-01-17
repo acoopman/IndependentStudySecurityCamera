@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "parse_argv.h"
+#include "feature_extract.h"
+#include "decision.h"
 
 using namespace cv;
 using namespace std;
@@ -30,8 +32,6 @@ int main(int argc, char *argv[])
     
   features_t features;
 
-
-    
   printf("argc = %i\n", argc);
 
   printf("usage:  ./video_in [-w foo.avi] [-source (0,1)] [-thresh (0-255)]\n");
@@ -94,30 +94,20 @@ int main(int argc, char *argv[])
 	
 	//returns the number of pixels that are greater than the threshold
 
-	motion_flag = detect_motion(diff_frame.data, height, width, &detect_params);
+	//motion_flag = detect_motion(diff_frame.data, height, width, &detect_params);
 
-	/*
-	void extract_features(features_t * features,
-			      uint8_t * in,
-			      int height,
-			      int width,
-			      motion_detect_params_t * param);
-
-	*/
 	
-	cout << "Pixel changes = " <<  detect_params.number_pixels_changed << " threshold = " <<  detect_params.threshold_pixel_change << endl;
-	cout << "std_x = " << detect_params.std_x  << " std_y = " << detect_params.std_y << endl;
+	extract_features(&features, diff_frame.data, height, width, &detect_params);
+
+	motion_flag = make_decision(&features,  &detect_params);
+
+	cout << "Pixel changes = " <<  features.number_pixels_changed
+	     << " threshold = " <<  detect_params.threshold_pixel_change << endl;
+	cout << "std_x = " << features.std_x  << " std_y = " << features.std_y << endl;
 	
 	if(motion_flag)
 	  {
 
-	    //check if correct
-	    //	    if( features.center_x != detect_params.center_x) cout << "ERROR\n";
-	    features.center_x = detect_params.center_x;
-	    features.center_y = detect_params.center_y;
-	    features.std_x = detect_params.std_x;
-	    features.std_y = detect_params.std_y;
-	    
 	    cout << "Motion detected \n";
 	    cout << "center_x = " << features.center_x  << "center_y = " << features.center_y << endl;
 	    circle(frame, Point(features.center_x, features.center_y), 10,
@@ -142,8 +132,10 @@ int main(int argc, char *argv[])
 
 	    //  cout << pt1.x << " " << pt1.y <<endl;
 	    
-	    rectangle(frame, pt1, pt2, Scalar(0,255,0));//, int lineType=8, int shift=0)¶)//, int thickness=1, int lineType=LINE_8, int shift=0 )
+	    rectangle(frame, pt1, pt2, Scalar(0,255,0));//, int lineType=8, int shift=0)¶)//, int thickness=1, int lineType=LINE_8, int shift=0 )coopman
 
+
+	    
 	  }
 
 	//------------------------------------------------------------------------------
