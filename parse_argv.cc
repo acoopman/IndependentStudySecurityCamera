@@ -27,9 +27,9 @@ void parse_argv(int argc, char *argv[],
 
       if( (argv[i][0] == '-')  && (argv[i][1] == 't') && (argv[i][2] == 'h'))
 	{
-	  params->pixel_value_threshold = atoi(argv[i+1]);;
+	  params->pixel_percent_threshold = atof(argv[i+1]);;
 	  i++;
-	  printf("threshold = %i\n",params->pixel_value_threshold);
+	  printf("threshold = %f\n",params->pixel_percent_threshold);
 	}
       
     }

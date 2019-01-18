@@ -24,11 +24,11 @@ int main(int argc, char *argv[])
   
   //lets configure ther background struct 
   motion_detect_params_t detect_params;
-  detect_params.update_frequency = -1; //-1 should never update background
+  detect_params.update_frequency = 3000; //-1 should never update background
   detect_params.blur_background = 1;
   detect_params.num_of_blurs = 5;
-  detect_params.threshold_pixel_change = 100;
-  detect_params.pixel_value_threshold = 75;
+  detect_params.threshold_pixel_diff = 75;
+  detect_params.pixel_percent_threshold = 1.0f;
     
   features_t features;
 
@@ -101,15 +101,15 @@ int main(int argc, char *argv[])
 
 	motion_flag = make_decision(&features,  &detect_params);
 
-	cout << "Pixel changes = " <<  features.number_pixels_changed
-	     << " threshold = " <<  detect_params.threshold_pixel_change << endl;
+	cout << "Percent pixel changed = " <<  features.percent_pixels_changed
+	     << " threshold = " <<  detect_params.threshold_pixel_diff << endl;
 	cout << "std_x = " << features.std_x  << " std_y = " << features.std_y << endl;
 	
 	if(motion_flag)
 	  {
 
 	    cout << "Motion detected \n";
-	    cout << "center_x = " << features.center_x  << "center_y = " << features.center_y << endl;
+	    cout << "center_x = " << features.center_x  << " center_y = " << features.center_y << endl;
 	    circle(frame, Point(features.center_x, features.center_y), 10,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 

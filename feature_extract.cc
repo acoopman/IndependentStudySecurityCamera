@@ -25,7 +25,7 @@ void extract_features(features_t * features,
 	    {
 	      for(int x = 0; x< width; x++) //process columns horizontal
 		{
-		  if(in[x + width*y  ] > param->pixel_value_threshold)
+		  if(in[x + width*y  ] > param->threshold_pixel_diff)
 		    {
 		      sum_x += x;
 		      sum_y += y;
@@ -35,8 +35,9 @@ void extract_features(features_t * features,
 		}
 	    }
 
-	  features->number_pixels_changed = count;
- 
+	  features->percent_pixels_changed = ((float)count/(float)(width*height))*100.0f;
+	  printf("count = %i   percent = %f   width = %i height = %i\n", count, features->percent_pixels_changed, width, height);
+	  fflush(stdout);
 	  //get the mean/center of the cluster
 
 	  if(count == 0)
@@ -58,12 +59,16 @@ void extract_features(features_t * features,
 	    {
 	      for(int x = 0; x< width; x++) //process columns horizontal
 		{
-		  if(in[x + width*y  ] > param->pixel_value_threshold)
+		  if(in[x + width*y] > param->threshold_pixel_diff)
 		    {
 		      sum_x += (features->center_x - x)*(features->center_x - x);
 		      sum_y += (features->center_y - y)*(features->center_y - y);
+		      // in[x + width*y] = 200; 
 		    }
-
+		  //  else
+		  //  {
+		  //     in[x + width*y] = 0; 
+		  //   }
 		}
 	    }
 
