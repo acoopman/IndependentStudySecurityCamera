@@ -36,8 +36,8 @@ void extract_features(features_t * features,
 	    }
 
 	  features->percent_pixels_changed = ((float)count/(float)(width*height))*100.0f;
-	  printf("count = %i   percent = %f   width = %i height = %i\n", count, features->percent_pixels_changed, width, height);
-	  fflush(stdout);
+	  // printf("count = %i   percent = %f   width = %i height = %i\n", count, features->percent_pixels_changed, width, height);
+	  //fflush(stdout);
 	  //get the mean/center of the cluster
 
 	  if(count == 0)

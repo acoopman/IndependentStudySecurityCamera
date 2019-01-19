@@ -8,17 +8,14 @@
 int make_decision(features_t * features,  motion_detect_params_t * param)
 {
 
-  //no pixels have changed, return no motion
-  if(features->percent_pixels_changed == 0)
-    return 0;
-
     //check to make sure the std are widthin the threshold
 
+/*
     if(features->std_x > 100.0f)
       return 0;
     if(features->std_y > 100.0f)
       return 0;
-
+*/
       int percent_change = features->percent_pixels_changed;
       int motion_flag = 0;
 

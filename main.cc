@@ -14,6 +14,8 @@ using namespace std;
 //to learn video in and out with opencv use this link:
 //https://www.learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
 
+//cap.set(cv2.CAP_PROP_AUTOFOCUS, 0) // turn the autofocus off
+
 int main(int argc, char *argv[])
 {
   video_in_params_t video_params;
@@ -27,8 +29,8 @@ int main(int argc, char *argv[])
   detect_params.update_frequency = 3000; //-1 should never update background
   detect_params.blur_background = 1;
   detect_params.num_of_blurs = 5;
-  detect_params.threshold_pixel_diff = 75;
-  detect_params.pixel_percent_threshold = 1.0f;
+  detect_params.threshold_pixel_diff = 25;
+  detect_params.pixel_percent_threshold = 0.1f;
     
   features_t features;
 
@@ -104,12 +106,14 @@ int main(int argc, char *argv[])
 	cout << "Percent pixel changed = " <<  features.percent_pixels_changed
 	     << " threshold = " <<  detect_params.threshold_pixel_diff << endl;
 	cout << "std_x = " << features.std_x  << " std_y = " << features.std_y << endl;
+	fflush(stdout);
 	
 	if(motion_flag)
 	  {
 
 	    cout << "Motion detected \n";
 	    cout << "center_x = " << features.center_x  << " center_y = " << features.center_y << endl;
+	    fflush(stdout);
 	    circle(frame, Point(features.center_x, features.center_y), 10,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 
