@@ -1,5 +1,6 @@
 #include "feature_extract.h"
 #include <math.h>
+#include "stats.h"
 
 //features so far
 //1) number pixels changed  TODO want it in percentage
@@ -13,6 +14,18 @@ void extract_features(features_t * features,
 		      int width,
 		      motion_detect_params_t * param)
 {
+  int histo[256];
+  //extract the mean and the std of the diff frame
+  float diff_mean = image_mean(in, (width*height));
+
+  float diff_std = image_std(in, (width*height), diff_mean);
+
+  image_histogram(in, (width*height), histo);
+  
+  printf("mean = %f  std = %f  thresh = %i---------\n", diff_mean, diff_std, param->threshold_pixel_diff);
+
+  param->threshold_pixel_diff = diff_mean + 4*diff_std; 
+  
 	//returns the number of pixels above the threshold
 	  //figure out how many pixels are greater than the threshold
 	  int count = 0;
@@ -63,12 +76,12 @@ void extract_features(features_t * features,
 		    {
 		      sum_x += (features->center_x - x)*(features->center_x - x);
 		      sum_y += (features->center_y - y)*(features->center_y - y);
-		      // in[x + width*y] = 200; 
+		       in[x + width*y] = 200; 
 		    }
-		  //  else
-		  //  {
-		  //     in[x + width*y] = 0; 
-		  //   }
+		    else
+		    {
+		       in[x + width*y] = 0; 
+		     }
 		}
 	    }
 

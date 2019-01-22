@@ -7,6 +7,7 @@
 #include "parse_argv.h"
 #include "feature_extract.h"
 #include "decision.h"
+#include "stats.h"
 
 using namespace cv;
 using namespace std;
@@ -151,7 +152,7 @@ int main(int argc, char *argv[])
 	imshow("frame",frame);
 	imshow("grayframe",gray_frame);
 	imshow("background_frame", background_frame);
-	imshow("diff",10*diff_frame);  
+	imshow("diff",diff_frame);  
        	
 	// Write the frame into the file 'outcpp.avi'
 	if(video_params.write_output)
