@@ -25,6 +25,9 @@ void extract_features(features_t * features,
   printf("mean = %f  std = %f  thresh = %i---------\n", diff_mean, diff_std, param->threshold_pixel_diff);
 
   param->threshold_pixel_diff = diff_mean + 4*diff_std; 
+
+
+  plot_histogram(histo, 256);
   
 	//returns the number of pixels above the threshold
 	  //figure out how many pixels are greater than the threshold

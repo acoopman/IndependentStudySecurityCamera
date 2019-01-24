@@ -9,7 +9,7 @@ float image_std(uint8_t * in, int count, float mean);
 
 void image_histogram(uint8_t * in, int count, int * histo);
 
-
+void plot_histogram(int * hist, int bins);
 
 
 
