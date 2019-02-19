@@ -1,6 +1,7 @@
+//parse_argv.cc  Written by Aidan Coopman 2019
 #include "parse_argv.h"
 
-
+//parse argv/argc from main()
 void parse_argv(int argc, char *argv[],
 		motion_detect_params_t * params,
 		video_in_params_t * video_params)
