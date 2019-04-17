@@ -27,11 +27,15 @@ int main(int argc, char *argv[])
   
   //lets configure ther background struct 
   motion_detect_params_t detect_params;
-  detect_params.update_frequency = 3000; //-1 should never update background
+  detect_params.update_frequency = 30000; //-1 should never update background
   detect_params.blur_background = 1;
   detect_params.num_of_blurs = 5;
-  detect_params.threshold_pixel_diff = 25;
-  detect_params.pixel_percent_threshold = 0.1f;
+  detect_params.min_threshold_diff = 40;
+  detect_params.std_factor = 4;
+  detect_params.pixel_percent_threshold = 0.25f;
+  detect_params.std_x_thresh = 200;
+  detect_params.std_y_thresh = 200;
+  detect_params.alpha = .98796;
     
   features_t features;
 
@@ -42,7 +46,8 @@ int main(int argc, char *argv[])
   parse_argv(argc, argv, &detect_params, &video_params);
 
   //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
-    VideoCapture cap(video_params.video_source); // open the default camera is 0, usb camera is 1
+      VideoCapture cap(video_params.video_source); // open the default camera is 0, usb camera is 1
+  //VideoCapture cap("wheelbarrel.avi"); // open the default camera is 0, usb camera is 1
     if(!cap.isOpened())  // check if we succeeded
       return -1;
 
@@ -100,14 +105,15 @@ int main(int argc, char *argv[])
 	//motion_flag = detect_motion(diff_frame.data, height, width, &detect_params);
 
 	
+	
 	extract_features(&features, diff_frame.data, height, width, &detect_params);
-
+	printf("main.cc: percent_pixels_changed = %f\n", features.percent_pixels_changed);
 	motion_flag = make_decision(&features,  &detect_params);
 
-	cout << "Percent pixel changed = " <<  features.percent_pixels_changed
-	     << " threshold = " <<  detect_params.threshold_pixel_diff << endl;
-	cout << "std_x = " << features.std_x  << " std_y = " << features.std_y << endl;
-	fflush(stdout);
+	//cout << "Percent pixel changed = " <<  features.percent_pixels_changed
+	//   << " threshold = " <<  detect_params.min_threshold_diff << endl;
+	//cout << "std_x = " << features.std_x  << " std_y = " << features.std_y << endl;
+	//fflush(stdout);
 	
 	if(motion_flag)
 	  {

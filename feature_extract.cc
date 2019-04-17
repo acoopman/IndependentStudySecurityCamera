@@ -23,15 +23,15 @@ void extract_features(features_t * features,
   //create a histogram of the different pixel values
   image_histogram(in, (width*height), histo);
   
-  printf("mean = %f  std = %f  thresh = %i---------\n",
-	 diff_mean,diff_std, param->threshold_pixel_diff);
+  float threshold = diff_mean + param->std_factor*diff_std;
 
-  //making a threshold by taking the mean and adding 4 stds
-  param->threshold_pixel_diff = diff_mean + 4*diff_std; 
+  if(param->min_threshold_diff > threshold)
+    threshold = param->min_threshold_diff;
 
   //plot the histogram, helps debug
   plot_histogram(histo, 256);
 
+  
   //LOCATION -------------------------------------------
   //returns the number of pixels above the threshold
   //figure out how many pixels are greater than the threshold
@@ -46,7 +46,7 @@ void extract_features(features_t * features,
     {
       for(int x = 0; x< width; x++) //process columns horizontal
 	{
-	  if(in[x + width*y  ] > param->threshold_pixel_diff)
+	  if(in[x + width*y  ] > threshold)
 	    {
 	      sum_x += x;
 	      sum_y += y;
@@ -70,7 +70,10 @@ void extract_features(features_t * features,
 
   //store the percent of pixels that have changed
   features->percent_pixels_changed = ((float)count/(float)(width*height))*100.0f;
-  
+
+  printf("fe.cc: mean=%f  std=%f  min_thresh=%i  calc_thresh=%f, pixel_change_percent=%f\n",
+	 diff_mean,diff_std, param->min_threshold_diff, threshold, features->percent_pixels_changed);
+	    fflush(stdout);  
   //-----------------------------------------
   //find the standard deviation of the cluster
   sum_x = 0;
@@ -80,7 +83,7 @@ void extract_features(features_t * features,
     {
       for(int x = 0; x< width; x++) //process columns horizontal
 	{
-	  if(in[x + width*y] > param->threshold_pixel_diff)
+	  if(in[x + width*y] > threshold)
 	    {
 	      sum_x += (features->center_x - x)*(features->center_x - x);
 	      sum_y += (features->center_y - y)*(features->center_y - y);

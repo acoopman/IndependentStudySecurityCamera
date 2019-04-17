@@ -23,7 +23,7 @@ void update_background(Mat & input, Mat & background, motion_detect_params_t * p
     }
   
   //expontial use_exponential_filter
-  float alpha = 0.9899;  //.99 - 4 seconds .999 - 
+  float alpha = params->alpha;  //.99 - 4 seconds .999 - 
   background = alpha*background + (1-alpha)*input;
 }
 
