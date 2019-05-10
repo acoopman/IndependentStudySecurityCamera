@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     return -1;
   
   //    if(write_output)
-  VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),10, Size(640,480));
+  VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),10, Size(640*2,480*2));
   
   //make an output window up
   namedWindow("frame",1);
@@ -139,19 +139,27 @@ int main(int argc, char *argv[])
 		    1); // Line Thickness (Optional)
 
 	//display the frames ----------------------------------------
-	Mat dst(frame.rows,frame.cols*2,3);//1);//Size(640,480)
+	Mat top(frame.rows,frame.cols*2,3);
+	Mat bottom(frame.rows,frame.cols*2,3);
+	Mat final_out(frame.rows*2,frame.cols*2,3);
 	Mat back_color;
+	Mat diff_color;
+	Mat gray_color;
 	cv::cvtColor(background_frame, back_color, cv::COLOR_GRAY2BGR);
-	cv::hconcat(frame, back_color, dst);
+	cv::cvtColor(gray_frame, gray_color, cv::COLOR_GRAY2BGR);
+	cv::cvtColor(diff_frame, diff_color, cv::COLOR_GRAY2BGR);
+	cv::hconcat(frame, gray_color, top);
+	cv::hconcat(diff_color, back_color, bottom);
+	cv::vconcat(top, bottom, final_out);
 	//imshow("frame",frame);
-	imshow("SecurityCamera: LEFT=detection : RIGHT=background ",dst);
+	imshow("SecurityCamera: LEFT=detection : RIGHT=background ",final_out);
 	//	imshow("grayframe",gray_frame);
 	//imshow("background_frame", background_frame);
-	imshow("diff",diff_frame);  
+	//	imshow("diff",bottom);  
        	
 	// Write the frame into the file 'outcpp.avi'
 	if(video_params.write_output)
-	  video_out.write(frame);
+	  video_out.write(final_out);
     
 	//press q to quit -------------------------------------------
 	int key = waitKey(30);
