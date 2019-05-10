@@ -94,5 +94,5 @@ void plot_histogram(int * hist, int bins)
     // putText(histImage,'OpenCV',Point(10,500), FONT_HERSHEY_SIMPLEX, 4,(255,255,255),2);
     */
     
-    namedWindow( "Result", 1 );    imshow( "Result", histImage );    
+    // namedWindow( "Result", 1 );    imshow( "Result", histImage );    
 }

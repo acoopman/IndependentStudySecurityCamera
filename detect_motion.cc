@@ -23,7 +23,8 @@ void update_background(Mat & input, Mat & background, motion_detect_params_t * p
     }
   
   //expontial use_exponential_filter
-  float alpha = params->alpha;  //.99 - 4 seconds .999 - 
+  float alpha = params->alpha;  //.99 - 4 seconds .999 -
+  //background is an int where alpha is a float, so possible round off error
   background = alpha*background + (1-alpha)*input;
 }
 

@@ -22,6 +22,7 @@ int main(int argc, char *argv[])
   video_in_params_t video_params;
   int motion_flag = 0;
   video_params.write_output = 0;
+  video_params.read_input = 0;
   video_params.outputfile = "output.avi";
   video_params.video_source = 1;
   
@@ -35,41 +36,41 @@ int main(int argc, char *argv[])
   detect_params.pixel_percent_threshold = 0.25f;
   detect_params.std_x_thresh = 200;
   detect_params.std_y_thresh = 200;
-  detect_params.alpha = .98796;
+  detect_params.alpha = .9913;
     
   features_t features;
 
-  printf("argc = %i\n", argc);
-
-  printf("usage:  ./video_in [-w foo.avi] [-source (0,1)] [-thresh (0-255)]\n");
+  printf("usage:  ./video_in [-f in.avi] [-w out.avi] [-source (0,1)] [-thresh (0-255)]\n");
   
   parse_argv(argc, argv, &detect_params, &video_params);
-
-  //    VideoCapture cap(1); // open the default camera is 0, usb camera is 1
-      VideoCapture cap(video_params.video_source); // open the default camera is 0, usb camera is 1
-  //VideoCapture cap("wheelbarrel.avi"); // open the default camera is 0, usb camera is 1
-    if(!cap.isOpened())  // check if we succeeded
-      return -1;
-
-    //    if(write_output)
-      VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),10, Size(640,480));
-    
-    
-    //make an output window up
-    namedWindow("frame",1);
-    namedWindow("grayframe",1);
-    namedWindow("background_frame",1);
-    namedWindow("diff",1);
-    
-    int frame_count = 0;
-    
-    Mat frame;
-    Mat background_frame;
-    Mat gray_frame;
-    Mat diff_frame;
-
   
-    //main loop of the program
+  VideoCapture cap;
+  
+  //either read in from file or use the default camera
+  if(video_params.read_input == 1)
+    cap.open(video_params.inputfile); // open the default camera is 0, usb camera is 1
+  else
+    cap.open(1); // open the default camera is 0, usb camera is 1
+  
+  if(!cap.isOpened())  // check if we succeeded
+    return -1;
+  
+  //    if(write_output)
+  VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),10, Size(640,480));
+  
+  //make an output window up
+  namedWindow("frame",1);
+  // namedWindow("grayframe",1);
+  namedWindow("background_frame",1);
+  namedWindow("diff",1);
+  
+  int frame_count = 0;
+  Mat frame;
+  Mat background_frame;
+  Mat gray_frame;
+  Mat diff_frame;
+  
+  //main loop of the program
     while(1)
       {
 	//use openCV's VideoCapture class to get an input frame from camera
@@ -79,8 +80,6 @@ int main(int argc, char *argv[])
 	int height  = frame.rows;
 	int width = frame.cols;
 
-	//cout << "Image size is (width, height)" << width << " " << height << endl;
-	
 	//covert the input frame to a black and white frame
 	cvtColor(frame, gray_frame, CV_BGR2GRAY);
 
@@ -92,19 +91,11 @@ int main(int argc, char *argv[])
 	if(frame_count == 0)
 	  background_frame = gray_frame.clone();
 	
-	//cout << "frame count = " << frame_count << endl;
-
 	//subtract current frame from the background frame
 	subtract_background(diff_frame, gray_frame, background_frame);
 
 	
 	//------------------------------------------------------------------------------
-	
-	//returns the number of pixels that are greater than the threshold
-
-	//motion_flag = detect_motion(diff_frame.data, height, width, &detect_params);
-
-	
 	
 	extract_features(&features, diff_frame.data, height, width, &detect_params);
 	printf("main.cc: percent_pixels_changed = %f\n", features.percent_pixels_changed);
@@ -124,28 +115,10 @@ int main(int argc, char *argv[])
 	    circle(frame, Point(features.center_x, features.center_y), 10,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 
-
-	    /*  
-	    int radius = ((detect_params.std_x+detect_params.std_y)/2);
-	    if(detect_params.center_x+radius > width)
-	      {
-		radius = width-detect_params.center_x -1;
-	      }
-	    if(detect_params.center_y+radius > height)
-	      {
-		radius = height-detect_params.center_y -1;
-	      }
-	    	    circle(frame, Point(detect_params.center_x, detect_params.center_y), radius,
-	    	   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
-	    */
 	    Point pt1(features.center_x+features.std_x, features.center_y-features.std_y);
 	    Point pt2(features.center_x-features.std_x, features.center_y+features.std_y);
 
-	    //  cout << pt1.x << " " << pt1.y <<endl;
-	    
-	    rectangle(frame, pt1, pt2, Scalar(0,255,0));//, int lineType=8, int shift=0)¶)//, int thickness=1, int lineType=LINE_8, int shift=0 )coopman
-
-
+	    rectangle(frame, pt1, pt2, Scalar(0,255,0));
 	    
 	  }
 
@@ -153,11 +126,27 @@ int main(int argc, char *argv[])
 	//update background frame every 30 frames, and if theres no motion
 	update_background(gray_frame, background_frame, &detect_params, motion_flag, frame_count);
 
+	std::string text = "Frame = ";
+	text += std::to_string(frame_count);
+	
+	//add frame number to video
+	cv::putText(frame, 
+		    text,
+		    cv::Point(50,400), // Coordinates
+		    cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+		    1.0, // Scale. 2.0 = 2x bigger
+		    cv::Scalar(255,255,255), // BGR Color
+		    1); // Line Thickness (Optional)
 
 	//display the frames ----------------------------------------
-	imshow("frame",frame);
-	imshow("grayframe",gray_frame);
-	imshow("background_frame", background_frame);
+	Mat dst(frame.rows,frame.cols*2,3);//1);//Size(640,480)
+	Mat back_color;
+	cv::cvtColor(background_frame, back_color, cv::COLOR_GRAY2BGR);
+	cv::hconcat(frame, back_color, dst);
+	//imshow("frame",frame);
+	imshow("SecurityCamera: LEFT=detection : RIGHT=background ",dst);
+	//	imshow("grayframe",gray_frame);
+	//imshow("background_frame", background_frame);
 	imshow("diff",diff_frame);  
        	
 	// Write the frame into the file 'outcpp.avi'
@@ -166,7 +155,6 @@ int main(int argc, char *argv[])
     
 	//press q to quit -------------------------------------------
 	int key = waitKey(30);
-	//	if(key == 113) //quit
 	  if(key == 'q') //quit	  
 	  break;
 

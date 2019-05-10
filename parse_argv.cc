@@ -17,6 +17,15 @@ void parse_argv(int argc, char *argv[],
 	  video_params->outputfile = argv[i+1];
 	  i++;
 	}
+	
+      if( (argv[i][0] == '-')  && (argv[i][1] == 'f'))
+	{
+	  video_params->read_input = 1;
+	  printf("Reading input\n");
+
+	  video_params->inputfile = argv[i+1];
+	  i++;
+	}
       
       if( (argv[i][0] == '-')  && (argv[i][1] == 's') && (argv[i][2] == 'o'))
 	{
