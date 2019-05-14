@@ -36,7 +36,7 @@ int main(int argc, char *argv[])
   detect_params.pixel_percent_threshold = 0.25f;
   detect_params.std_x_thresh = 200;
   detect_params.std_y_thresh = 200;
-  detect_params.alpha = .9913;
+  detect_params.alpha = .992;
     
   features_t features;
 
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     return -1;
   
   //    if(write_output)
-  VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),10, Size(640*2,480*2));
+  VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),25, Size(640*2,480*2));
   
   //make an output window up
   namedWindow("frame",1);
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	//------------------------------------------------------------------------------
 	
 	extract_features(&features, diff_frame.data, height, width, &detect_params);
-	printf("main.cc: percent_pixels_changed = %f\n", features.percent_pixels_changed);
+	//printf("main.cc: percent_pixels_changed = %f\n", features.percent_pixels_changed);
 	motion_flag = make_decision(&features,  &detect_params);
 
 	//cout << "Percent pixel changed = " <<  features.percent_pixels_changed
@@ -109,9 +109,9 @@ int main(int argc, char *argv[])
 	if(motion_flag)
 	  {
 
-	    cout << "Motion detected \n";
-	    cout << "center_x = " << features.center_x  << " center_y = " << features.center_y << endl;
-	    fflush(stdout);
+	    //cout << "Motion detected \n";
+	    //cout << "center_x = " << features.center_x  << " center_y = " << features.center_y << endl;
+	    //fflush(stdout);
 	    circle(frame, Point(features.center_x, features.center_y), 10,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 
@@ -125,19 +125,7 @@ int main(int argc, char *argv[])
 	//------------------------------------------------------------------------------
 	//update background frame every 30 frames, and if theres no motion
 	update_background(gray_frame, background_frame, &detect_params, motion_flag, frame_count);
-
-	std::string text = "Frame = ";
-	text += std::to_string(frame_count);
 	
-	//add frame number to video
-	cv::putText(frame, 
-		    text,
-		    cv::Point(50,400), // Coordinates
-		    cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
-		    1.0, // Scale. 2.0 = 2x bigger
-		    cv::Scalar(255,255,255), // BGR Color
-		    1); // Line Thickness (Optional)
-
 	//display the frames ----------------------------------------
 	Mat top(frame.rows,frame.cols*2,3);
 	Mat bottom(frame.rows,frame.cols*2,3);
@@ -148,11 +136,65 @@ int main(int argc, char *argv[])
 	cv::cvtColor(background_frame, back_color, cv::COLOR_GRAY2BGR);
 	cv::cvtColor(gray_frame, gray_color, cv::COLOR_GRAY2BGR);
 	cv::cvtColor(diff_frame, diff_color, cv::COLOR_GRAY2BGR);
+
+	//----------------------------------------------------
+	std::string text = "Frame = ";
+	text += std::to_string(frame_count);	
+	//add frame number to video
+	cv::putText(frame, 
+		    text,
+		    cv::Point(50,400), // Coordinates
+		    cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+		    1.0, // Scale. 2.0 = 2x bigger
+		    cv::Scalar(255,255,255), // BGR Color
+		    1); // Line Thickness (Optional)
+
+	//----------------------------------------------------
+	std::string blurred_text = "Blurred Gray Input";
+	cv::putText(gray_color, 
+		    blurred_text,
+		    cv::Point(50,400), // Coordinates
+		    cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+		    1.0, // Scale. 2.0 = 2x bigger
+		    cv::Scalar(255,255,255), // BGR Color
+		    1); // Line Thickness (Optional)
+
+	//----------------------------------------------------
+	std::string back_text = "Background Frame: alpha = ";
+	back_text += std::to_string(detect_params.alpha);	
+	//add diff percent to video
+	cv::putText(back_color, 
+		    back_text,
+		    cv::Point(50,400), // Coordinates
+		    cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+		    1.0, // Scale. 2.0 = 2x bigger
+		    cv::Scalar(255,255,255), // BGR Color
+		    1); // Line Thickness (Optional)
+
+	//----------------------------------------------------
+	std::string diff_text = "Active Pixels % = ";
+	diff_text += std::to_string(features.percent_pixels_changed);	
+	//add diff percent to video
+	cv::putText(diff_color, 
+		    diff_text,
+		    cv::Point(50,400), // Coordinates
+		    cv::FONT_HERSHEY_COMPLEX_SMALL, // Font
+		    1.0, // Scale. 2.0 = 2x bigger
+		    cv::Scalar(255,255,255), // BGR Color
+		    1); // Line Thickness (Optional)
+
+	
+
+
+	//--------------------------------------------------
+
+
+
 	cv::hconcat(frame, gray_color, top);
 	cv::hconcat(diff_color, back_color, bottom);
 	cv::vconcat(top, bottom, final_out);
 	//imshow("frame",frame);
-	imshow("SecurityCamera: LEFT=detection : RIGHT=background ",final_out);
+	imshow("SecurityCamera:",final_out);
 	//	imshow("grayframe",gray_frame);
 	//imshow("background_frame", background_frame);
 	//	imshow("diff",bottom);  

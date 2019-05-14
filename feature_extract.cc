@@ -71,9 +71,10 @@ void extract_features(features_t * features,
   //store the percent of pixels that have changed
   features->percent_pixels_changed = ((float)count/(float)(width*height))*100.0f;
 
-  printf("fe.cc: mean=%f  std=%f  min_thresh=%i  calc_thresh=%f, pixel_change_percent=%f\n",
-	 diff_mean,diff_std, param->min_threshold_diff, threshold, features->percent_pixels_changed);
-	    fflush(stdout);  
+  //printf("fe.cc: mean=%f  std=%f  min_thresh=%i  calc_thresh=%f, pixel_change_percent=%f\n",
+  //diff_mean,diff_std, param->min_threshold_diff, threshold, features->percent_pixels_changed);
+  //fflush(stdout);  
+
   //-----------------------------------------
   //find the standard deviation of the cluster
   sum_x = 0;
