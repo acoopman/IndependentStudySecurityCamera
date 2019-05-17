@@ -14,7 +14,9 @@ Compile:
 To run the program:
 
 >> ./video_in  -s 0     //source is the default camera on a laptop
+
 >> ./video_in  -s 1     //source is the usb camera 
+
 >> ./video_in -f input.avi -w output.avi  //reads the input file and writes the output file  
 
 ![alt text](./pack2.png)
