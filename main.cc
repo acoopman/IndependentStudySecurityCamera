@@ -12,10 +12,6 @@
 using namespace cv;
 using namespace std;
 
-//to learn video in and out with opencv use this link:
-//https://www.learnopencv.com/read-write-and-display-a-video-using-opencv-cpp-python/
-
-//cap.set(cv2.CAP_PROP_AUTOFOCUS, 0) // turn the autofocus off
 
 int main(int argc, char *argv[])
 {
@@ -55,15 +51,8 @@ int main(int argc, char *argv[])
   if(!cap.isOpened())  // check if we succeeded
     return -1;
   
-  //    if(write_output)
   VideoWriter video_out(video_params.outputfile,CV_FOURCC('M','J','P','G'),25, Size(640*2,480*2));
-  
-  //make an output window up
-  namedWindow("frame",1);
-  // namedWindow("grayframe",1);
-  namedWindow("background_frame",1);
-  namedWindow("diff",1);
-  
+    
   int frame_count = 0;
   Mat frame;
   Mat background_frame;
@@ -93,37 +82,25 @@ int main(int argc, char *argv[])
 	
 	//subtract current frame from the background frame
 	subtract_background(diff_frame, gray_frame, background_frame);
-
 	
 	//------------------------------------------------------------------------------
 	
 	extract_features(&features, diff_frame.data, height, width, &detect_params);
-	//printf("main.cc: percent_pixels_changed = %f\n", features.percent_pixels_changed);
 	motion_flag = make_decision(&features,  &detect_params);
-
-	//cout << "Percent pixel changed = " <<  features.percent_pixels_changed
-	//   << " threshold = " <<  detect_params.min_threshold_diff << endl;
-	//cout << "std_x = " << features.std_x  << " std_y = " << features.std_y << endl;
-	//fflush(stdout);
 	
 	if(motion_flag)
 	  {
-
-	    //cout << "Motion detected \n";
-	    //cout << "center_x = " << features.center_x  << " center_y = " << features.center_y << endl;
-	    //fflush(stdout);
 	    circle(frame, Point(features.center_x, features.center_y), 10,
 		   Scalar(0,255,0), 5);//, int lineType=8, int shift=0)¶
 
 	    Point pt1(features.center_x+features.std_x, features.center_y-features.std_y);
 	    Point pt2(features.center_x-features.std_x, features.center_y+features.std_y);
 
-	    rectangle(frame, pt1, pt2, Scalar(0,255,0));
-	    
+	    rectangle(frame, pt1, pt2, Scalar(0,255,0));	    
 	  }
 
 	//------------------------------------------------------------------------------
-	//update background frame every 30 frames, and if theres no motion
+
 	update_background(gray_frame, background_frame, &detect_params, motion_flag, frame_count);
 	
 	//display the frames ----------------------------------------
@@ -183,23 +160,15 @@ int main(int argc, char *argv[])
 		    cv::Scalar(255,255,255), // BGR Color
 		    1); // Line Thickness (Optional)
 
-	
-
-
+       
 	//--------------------------------------------------
-
-
 
 	cv::hconcat(frame, gray_color, top);
 	cv::hconcat(diff_color, back_color, bottom);
 	cv::vconcat(top, bottom, final_out);
-	//imshow("frame",frame);
 	imshow("SecurityCamera:",final_out);
-	//	imshow("grayframe",gray_frame);
-	//imshow("background_frame", background_frame);
-	//	imshow("diff",bottom);  
        	
-	// Write the frame into the file 'outcpp.avi'
+	// Write the final output
 	if(video_params.write_output)
 	  video_out.write(final_out);
     
@@ -215,8 +184,7 @@ int main(int argc, char *argv[])
 	  }
 	
 	//update frame counter
-	frame_count++;
-	
+	frame_count++;	
     }
     // When everything done, release the video capture and write object
     cap.release();
